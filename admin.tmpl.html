@@ -1,0 +1,77 @@
+{{ roles := .Roles }}
+{{ if .Flash }}
+<div>{{ .Flash }}</div>
+{{ end }}
+
+<h1>Users</h1>
+<table>
+    <tr>
+        <th>User</th>
+        <th>Roles</th>
+        <th>Admin</th>
+        <th>Devices</th>
+    </tr>
+    {{ range .Users }}
+    <tr>
+        <th>{{ .ID }}</th>
+        {{ $userID = .ID }}
+        <td>
+            {{ range .Roles }}
+            {{ $role = . }}
+            <div>
+                {{ $role }}
+                <form action="/admin/op" method="POST">
+                    <input type="hidden" name="op" value="delete_role" />
+                    <input type="hidden" name="user" value="{{ $userID }}" />
+                    <input type="hidden" name="role" value="{{ $role }}" />
+                    <button>Delete</button>
+                    </from>
+            </div>
+            {{ end }}
+
+            <form action="/admin/op" method="POST">
+                <input type="hidden" name="op" value="add_role" />
+                <input type="hidden" name="user" value="{{ $userID }}" />
+                <select name="role">
+                    {{ range $roles }}
+                    <option value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <button>Add Role</button>
+            </form>
+
+            {{ end }}
+        </td>
+
+        <td>
+            {{ if .Admin }}
+            Admin
+
+            <form action="/admin/op" method="POST">
+                <input type="hidden" name="op" value="delete_admin" />
+                <button>Remove admin</button>
+                </from>
+
+                {{ else }}
+                <form action="/admin/op" method="POST">
+                    <input type="hidden" name="op" value="add_admin" />
+                    <button>Make admin</button>
+                    </from>
+                    {{ end }}
+        </td>
+
+        <td>
+            {{ if .Devices }}
+            Provisioned
+
+            <form action="/admin/op" method="POST">
+                <input type="hidden" name="op" value="reset_devices" />
+                <button>Reset</button>
+                </from>
+                {{ else }}
+                Not provisioned
+                {{ end }}
+    </tr>
+
+    {{ end }}
+</table>
